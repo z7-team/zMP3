@@ -13,6 +13,7 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+let queue = new Array();
 
 // initialize discord client
 const client = new Discord.Client();
@@ -20,11 +21,6 @@ const client = new Discord.Client();
 client.once('ready', () => {
 	console.log('Ready!');
 });
-
-// welcome message
-/*client.on('guildMemberAdd', member =>{
-	member.guild.channels.get('channelID').send('Welcome ' + member.nickname + ' to the Z7 army!');
-});*/
 
 // commands
 client.on('message', async (message) => {
@@ -53,6 +49,35 @@ client.on('message', async (message) => {
 				.catch((reject) => {
 					console.error(reject);
 				});
+		}
+	}
+	else if (command == 'add'){
+		if (!args.length){
+			message.channel.send("Please provide a song link.");
+		}
+		else{
+			var url = args[0];
+			//console.log(url);
+			queue.push(url);
+			queue[0] = url;
+			console.dir(queue);
+			message.channel.send('Song added to queue.');
+		}
+		
+	}
+	else if (command == 'list'){
+		var titles = new Array();
+		if (queue.length > 0){
+			for (var i = 0; i < queue.length; i++){
+				ytdl.getInfo(queue[i]).then(info => {
+					message.channel.send(info.videoDetails.title);
+					console.log(info.videoDetails.title);
+					titles[i] = info.videoDetails.title;
+				});
+			}
+			for (var i = 0; i < queue.length; i++){
+				message.channel.send('Song: ' + titles[i]);
+			}
 		}
 	}
 	else {
